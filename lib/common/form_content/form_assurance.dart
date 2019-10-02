@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 
 class FormAssurance extends StatefulWidget {
   final FormRepository formRepository;
-
+  final double paddingBottom;
   final StreamSink flowSink;
 
   const FormAssurance(
-      {Key key, @required this.flowSink, @required this.formRepository})
+      {Key key, @required this.flowSink, @required this.formRepository, this.paddingBottom = 64.0})
       : super(key: key);
 
   @override
@@ -75,7 +75,7 @@ class _FormAssuranceState extends State<FormAssurance> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 64.0),
+      padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: widget.paddingBottom),
       child: ListView(
         children: <Widget>[
           Padding(

@@ -121,6 +121,7 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
                       '${DateTime.now().millisecondsSinceEpoch}.png',
                     );
 
+
                     // Attempt to take a picture and log where it's been saved.
                     await state.controller.takePicture(path);
 
@@ -140,6 +141,8 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
           }
 
           if (state is Constat1Finish) {
+            FormRepository.persistNumeroConstat(state.numero);
+
             return Scaffold(
                 body: Padding(
               padding: const EdgeInsets.all(16.0),

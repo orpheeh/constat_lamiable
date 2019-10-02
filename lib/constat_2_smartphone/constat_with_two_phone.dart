@@ -108,6 +108,8 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
           }
 
           if (state is Constat2Finish) {
+            FormRepository.persistNumeroConstat(state.numero);
+
             return Scaffold(
                 body: Padding(
               padding: const EdgeInsets.all(16.0),

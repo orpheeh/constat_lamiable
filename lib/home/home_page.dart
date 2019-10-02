@@ -29,8 +29,13 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                            formRepository: widget.formRepository,
+                            repository: widget.repository,
+                          )));
             },
             icon: Icon(Icons.person),
           )
@@ -54,7 +59,6 @@ class _HomePageState extends State<HomePage> {
                                   "B": widget.formRepository2
                                 })));
               },
-              padding: EdgeInsets.all(16.0),
               color: Colors.blue,
               textColor: Colors.white,
               child: Row(
@@ -68,7 +72,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: RaisedButton(
               onPressed: () {
                 Navigator.push(
@@ -79,7 +83,6 @@ class _HomePageState extends State<HomePage> {
                               repository: widget.repository,
                             )));
               },
-              padding: EdgeInsets.all(16.0),
               color: Colors.blue,
               textColor: Colors.white,
               child: Row(

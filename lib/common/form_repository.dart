@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'form_content/drawing_table.dart';
 
 class FormRepository {
+
+  static const String KEY_NUM_CONSTAT = "numero_constat";
+
+  static Future<void> persistNumeroConstat(String numero) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(KEY_NUM_CONSTAT, numero);
+  }
+
+  static Future<String> getNumeroConstat() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey(KEY_NUM_CONSTAT)){
+      return sharedPreferences.getString(KEY_NUM_CONSTAT);
+    } else {
+
+      return "";
+    }
+  }
+
+  FormRepository() {
+    assurance.load();
+    conducteur.load();
+  }
+
   //Vehicule
   final List<CarType> carTypes = [
     CarType(name: "car", asset: "assets/images/car.png"),
@@ -111,14 +135,14 @@ class FormRepository {
         },
         "circonstance": getSelectedCirconstances(),
         "croquis": List.generate(croquis.points.length, (index) {
-          if(croquis.points[index] == null){
+          if (croquis.points[index] == null) {
             return null;
           } else {
             return {"x": croquis.points[index].x, "y": croquis.points[index].y};
           }
         }),
-        "signature":List.generate(points.length, (index) {
-          if(points[index] == null){
+        "signature": List.generate(points.length, (index) {
+          if (points[index] == null) {
             return null;
           } else {
             return {"x": points[index].x, "y": points[index].y};
@@ -186,6 +210,18 @@ class Temoin {
 }
 
 class Assurance {
+  static const KEY_NAME = "assurance_nom";
+  static const KEY_FIRST_NAME = "assurance_prenom";
+  static const KEY_BP = "assurance_bp";
+  static const KEY_TEL = "assurance_tel";
+  static const KEY_ADRESSE = "assurance_addr";
+  static const KEY_STE_ASSURANCE = "ste_assurance";
+  static const KEY_NUM_POLICE = "assurance_police";
+  static const KEY_NUM_CR = "assurance_cr";
+  static const KEY_AG = "assurance_ag";
+  static const KEY_VAL_DU = "assurance_du";
+  static const KEY_VAL_AU = "assurance_au";
+
   String nom = "";
   String prenom = "";
   String adresse = "";
@@ -211,9 +247,53 @@ class Assurance {
         "att_valide_au": valableAu.toIso8601String().split('T')[0],
         "ag_courtier": agenceCourtier
       };
+
+  Future<void> persist() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(KEY_NAME, nom);
+    sharedPreferences.setString(KEY_FIRST_NAME, prenom);
+    sharedPreferences.setString(KEY_ADRESSE, adresse);
+    sharedPreferences.setString(KEY_BP, bp);
+    sharedPreferences.setString(KEY_TEL, tel);
+    sharedPreferences.setString(KEY_NUM_POLICE, numeroPolice);
+    sharedPreferences.setString(KEY_NUM_CR, numeroCarteRose);
+    sharedPreferences.setString(KEY_AG, agenceCourtier);
+    sharedPreferences.setInt(KEY_VAL_DU, valableDu.millisecondsSinceEpoch);
+    sharedPreferences.setInt(KEY_VAL_AU, valableAu.millisecondsSinceEpoch);
+  }
+
+  Future<void> load() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (!sharedPreferences.containsKey(KEY_NAME)) {
+      return;
+    }
+    this.nom = sharedPreferences.getString(KEY_NAME);
+    this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
+    this.adresse = sharedPreferences.getString(KEY_ADRESSE);
+    this.bp = sharedPreferences.getString(KEY_BP);
+    this.tel = sharedPreferences.getString(KEY_TEL);
+    this.numeroPolice = sharedPreferences.getString(KEY_NUM_POLICE);
+    this.numeroCarteRose = sharedPreferences.getString(KEY_NUM_CR);
+    this.agenceCourtier = sharedPreferences.getString(KEY_AG);
+    this.valableDu = DateTime.fromMicrosecondsSinceEpoch(
+        sharedPreferences.getInt(KEY_VAL_DU));
+    this.valableAu = DateTime.fromMicrosecondsSinceEpoch(
+        sharedPreferences.getInt(KEY_VAL_AU));
+  }
 }
 
 class Conducteur {
+  static const KEY_NAME = "permis_nom";
+  static const KEY_FIRST_NAME = "permis_prenom";
+  static const KEY_CYCLO = "permis_cyclo";
+  static const KEY_TEL = "permis_tel";
+  static const KEY_ADRESSE = "permis_addr";
+  static const KEY_NUM = "permis_numero";
+  static const KEY_CAT = "permis_cat";
+  static const KEY_DEL = "permis_del";
+  static const KEY_DEL_PAR = "permis_del_par";
+  static const KEY_DATE_VAL = "permis_val";
+
   String nom = "";
   String prenom = "";
   String adresse = "";
@@ -238,6 +318,39 @@ class Conducteur {
         "delivre_par": delivrerPar,
         "valable": dateValidite.toIso8601String().split('T')[0]
       };
+
+  Future<void> persist() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(KEY_NAME, nom);
+    sharedPreferences.setString(KEY_FIRST_NAME, prenom);
+    sharedPreferences.setString(KEY_ADRESSE, adresse);
+    sharedPreferences.setString(KEY_CYCLO, licenceCyclomoteur);
+    sharedPreferences.setString(KEY_TEL, telephone);
+    sharedPreferences.setString(KEY_NUM, numeroPermisConduire);
+    sharedPreferences.setString(KEY_CAT, category);
+    sharedPreferences.setInt(KEY_DEL, delivrer.millisecondsSinceEpoch);
+    sharedPreferences.setString(KEY_DEL_PAR, delivrerPar);
+    sharedPreferences.setInt(KEY_DATE_VAL, dateValidite.millisecondsSinceEpoch);
+  }
+
+  Future<void> load() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (!sharedPreferences.containsKey(KEY_NAME)) {
+      return;
+    }
+    this.nom = sharedPreferences.getString(KEY_NAME);
+    this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
+    this.adresse = sharedPreferences.getString(KEY_ADRESSE);
+    this.licenceCyclomoteur = sharedPreferences.getString(KEY_CYCLO);
+    this.telephone = sharedPreferences.getString(KEY_TEL);
+    this.numeroPermisConduire = sharedPreferences.getString(KEY_NUM);
+    this.category = sharedPreferences.getString(KEY_CAT);
+    this.delivrer =
+        DateTime.fromMillisecondsSinceEpoch(sharedPreferences.getInt(KEY_DEL));
+    this.delivrerPar = sharedPreferences.getString(KEY_DEL_PAR);
+    this.dateValidite = DateTime.fromMillisecondsSinceEpoch(
+        sharedPreferences.getInt(KEY_DATE_VAL));
+  }
 }
 
 class Circonstance {

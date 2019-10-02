@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 class FormConducteur extends StatefulWidget {
   final FormRepository formRepository;
 
+  final double paddingBottom;
+
   final StreamSink flowSink;
 
   const FormConducteur(
-      {Key key, @required this.formRepository, @required this.flowSink})
+      {Key key, @required this.formRepository, @required this.flowSink, this.paddingBottom = 64.0})
       : super(key: key);
 
   @override
@@ -83,7 +85,7 @@ class _FormConducteurState extends State<FormConducteur> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Colors.transparent),
-      margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 64.0),
+      margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: widget.paddingBottom),
       child: ListView(
         children: <Widget>[
           Padding(

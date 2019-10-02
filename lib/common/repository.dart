@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import 'form_repository.dart';
+
 class Repository {
   static const IP = "http://192.168.100.216:3000";
 
@@ -36,8 +38,25 @@ class Repository {
     }
   }
 
-  Future<void> uploadPicture(
-      {File file, String numero}) async {
+  Future<String> getPDF() async {
+    String numero = await FormRepository.getNumeroConstat();
+
+    final response = await http.get(
+      IP + "/constat/$numero",
+      headers: {"content-type": "application/json"},
+    );
+    if (response.statusCode == 200) {
+      print(response.body);
+      final Map<String, dynamic> map = jsonDecode(response.body)["constat"];
+      return map["vehiculeA"]["finish"] && map["vehiculeB"]["finish"]
+          ? map["final"]
+          : "";
+    } else {
+      throw Exception("No constat with num $numero");
+    }
+  }
+
+  Future<void> uploadPicture({File file, String numero}) async {
     print("prepare send image");
     if (file == null) return;
     print("send image");
