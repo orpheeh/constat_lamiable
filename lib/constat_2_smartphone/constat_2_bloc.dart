@@ -26,7 +26,6 @@ class Constat2Bloc extends Bloc<Constat2Event, Constat2State> {
       yield Constat2Loading();
 
       try {
-        print("Take picture start");
         // Obtain a list of the available cameras on the device.
         final cameras = await availableCameras();
 
@@ -58,14 +57,15 @@ class Constat2Bloc extends Bloc<Constat2Event, Constat2State> {
       yield Constat2Loading();
 
       try {
-        String numero = await BarcodeScanner.scan();
-        print(numero);
+        String data = await BarcodeScanner.scan();
+        String numero = data.split(':')[0];
+        String vehicule = data.split(':')[1] == 'A' ? 'B' : 'A';
         if (numero == null || numero == "") {
           yield Constat2InitialState(formRepository: event.formRepository);
         } else {
           yield Constat2Form(
               numero: numero,
-              vehicule: "B",
+              vehicule: vehicule,
               formRepository: event.formRepository,
               scrollPercentInital: 0.0);
         }
@@ -78,7 +78,6 @@ class Constat2Bloc extends Bloc<Constat2Event, Constat2State> {
       yield Constat2Loading();
       try {
         var image = event.file;
-        print("Take picture finish !");
         await repository.uploadPicture(file: image, numero: event.numero);
 
         event.formRepository.pictureCount++;
@@ -102,7 +101,7 @@ class Constat2Bloc extends Bloc<Constat2Event, Constat2State> {
             vehicule: event.vehicule,
             recap: event.formRepository.getRecap());
         //verify result
-        yield Constat2Finish(numero: event.numero);
+        yield Constat2Finish(numero: event.numero, vehicule: event.vehicule);
         //If on result, vehiculeA.finish == true and vehiculeB.finish == true
         //Else start new form
       } catch (error) {
@@ -147,8 +146,9 @@ class Constat2QRCodeState extends Constat2State {
 
 class Constat2Finish extends Constat2State {
   final String numero;
+  final String vehicule;
 
-  Constat2Finish({@required this.numero});
+  Constat2Finish({@required this.vehicule, @required this.numero});
 }
 
 class Constat2Form extends Constat2State {

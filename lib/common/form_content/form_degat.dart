@@ -99,7 +99,8 @@ class _FormDegatState extends State<FormDegat> {
                 ),
                 Expanded(
                     child: Text(
-                        "Cochez cette case si il y'a eu des bléssés, même légers ?"))
+                        "Cochez cette case si il y'a eu des bléssés, même légers ?",
+                        style: TextStyle(fontSize: 12.0),))
               ],
             ),
             Row(
@@ -114,7 +115,8 @@ class _FormDegatState extends State<FormDegat> {
                 ),
                 Expanded(
                     child: Text(
-                        "Cochez cette case si il y'a eu des dégâts matériels autres qu'aux véhicules A et B?"))
+                        "Cochez cette case si il y'a eu des dégâts matériels autres qu'aux véhicules A et B?",
+                        style: TextStyle(fontSize: 12.0),))
               ],
             ),
             Padding(

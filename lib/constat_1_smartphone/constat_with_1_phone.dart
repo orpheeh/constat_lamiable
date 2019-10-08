@@ -133,7 +133,6 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
                             file: File(path)));
                   } catch (e) {
                     // If an error occurs, log the error to the console.
-                    print(e);
                   }
                 },
               ),
@@ -201,8 +200,40 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
 
           if (state is Constat1Failure) {
             return Scaffold(
-              body: Center(
-                child: Text(state.error),
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Icon(Icons.error, color: Colors.grey, size: 32.0,),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Une erreur c'est produite soit parce que vous n'êtes pas connecté au réseaux soit parce que vous n'avez pas remplis tous les champs",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12.0),),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Dans tous les cas, nous vous conseillons de vérifier votre connexion et recommencer, merci.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12.0),),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: RaisedButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Retour à l'accueil"),
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           }

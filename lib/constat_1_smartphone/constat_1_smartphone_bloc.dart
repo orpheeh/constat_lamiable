@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
-import 'package:constat_lamiable/common/custom_image_picker.dart';
 import 'package:constat_lamiable/common/form_repository.dart';
 import 'package:constat_lamiable/common/repository.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +43,6 @@ class Constat1Bloc extends Bloc<Constat1Event, Constat1State> {
       yield Constat1Loading();
       try {
         var image = event.file;
-        print("Take picture finish !");
         await repository.uploadPicture(file: image, numero: event.numero);
 
         event.formRepository.pictureCount++;
@@ -61,7 +59,6 @@ class Constat1Bloc extends Bloc<Constat1Event, Constat1State> {
       yield Constat1Loading();
 
       try {
-        print("Take picture start");
         // Obtain a list of the available cameras on the device.
         final cameras = await availableCameras();
 

@@ -6,6 +6,7 @@ import 'package:constat_lamiable/common/form_repository.dart';
 import 'package:constat_lamiable/common/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -23,71 +24,22 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   int _currentIndex = 0;
   String _numero;
+  String _vehicule;
 
   Future<String> numeroPdf;
 
   StreamController assuranceStreamController = new StreamController();
   StreamController permisStreamController = new StreamController();
 
-  List<Widget> getPages({String numero, String pdfURL}) => [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                  child: FormAssurance(
-                      formRepository: widget.formRepository,
-                      flowSink: assuranceStreamController.sink,
-                      paddingBottom: 16.0)),
-              RaisedButton(
-                  color: Colors.blue,
-                  textColor: Colors.white,
-                  onPressed: () {
-                    //Persist assurance
-                    widget.formRepository.assurance.persist();
-                    Fluttertoast.showToast(
-                        msg: "Nouvelles informations enregistré !",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIos: 3,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 14.0);
-                  },
-                  child: Text("Enregistrer"))
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                  child: FormConducteur(
-                      formRepository: widget.formRepository,
-                      flowSink: permisStreamController.sink,
-                      paddingBottom: 16.0)),
-              RaisedButton(
-                  color: Colors.blue,
-                  textColor: Colors.white,
-                  onPressed: () {
-                    //Persist permis
-                    widget.formRepository.conducteur.persist();
-                    Fluttertoast.showToast(
-                        msg: "Nouvelle informations enregistré !",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIos: 3,
-                        backgroundColor: Colors.blue,
-                        textColor: Colors.white,
-                        fontSize: 14.0);
-                  },
-                  child: Text("Enregistrer"))
-            ],
-          ),
-        ),
+  List<Widget> getPages({String numero, String pdfURL, String vehicule}) => [
+        FormAssurance(
+            formRepository: widget.formRepository,
+            flowSink: assuranceStreamController.sink,
+            paddingBottom: 16.0),
+        FormConducteur(
+            formRepository: widget.formRepository,
+            flowSink: permisStreamController.sink,
+            paddingBottom: 16.0),
         numero == ""
             ? Text("Aucun constat")
             : Column(
@@ -110,12 +62,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text("Télécharger le PDF")),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                        "Vous ne pouvez pas télécharger le PDF car l'autre partie du formulaire n'a pas encore été remplis !",
-                        textAlign: TextAlign.center,
-                        style:
-                            TextStyle(fontSize: 10.0, color: Colors.grey[700])),
-                  )
+                    child: pdfURL == "" || pdfURL == null
+                        ? Text(
+                            "Vous ne pouvez pas télécharger le PDF car l'autre partie du formulaire n'a pas encore été remplis !",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 10.0, color: Colors.grey[700]))
+                        : Container(),
+                  ),
+                  pdfURL == "" || pdfURL == null
+                        ? Center(
+                    child: QrImage(
+                      data: "$numero:$vehicule",
+                      version: QrVersions.auto,
+                      size: 100.0,
+                    ),
+                  ):Container(),
                 ],
               )
       ];
@@ -130,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    loadNumeroCompteur();
+    loadNumeroConstat();
     numeroPdf = widget.repository.getPDF();
   }
 
@@ -140,14 +102,48 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void loadNumeroCompteur() async {
+  void loadNumeroConstat() async {
     _numero = await FormRepository.getNumeroConstat();
+    _vehicule = await FormRepository.getVehiculeConstat();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mes informations personnelles")),
+      floatingActionButton: _currentIndex == 2
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                if (_currentIndex == 1) {
+                  widget.formRepository.conducteur.persist();
+                  Fluttertoast.showToast(
+                      msg: "Informations du permis enregistré !",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIos: 5,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 14.0);
+                } else if (_currentIndex == 0) {
+                  //Persist assurance
+                  widget.formRepository.assurance.persist();
+                  Fluttertoast.showToast(
+                      msg: "Information sur l'assurance enregistré !",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIos: 5,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 14.0);
+                }
+              },
+              child: Icon(Icons.save_alt),
+            ),
+      appBar: AppBar(
+          title: Text(
+        "Mes informations personnelles",
+        style: TextStyle(fontSize: 14.0),
+      )),
       bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
@@ -169,11 +165,11 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return getPages(
-                  numero: _numero, pdfURL: snapshot.data)[_currentIndex];
+                  numero: _numero, pdfURL: snapshot.data, vehicule: _vehicule)[_currentIndex];
             }
             if (snapshot.hasError) {
               return getPages(
-                  numero: _numero, pdfURL: snapshot.data)[_currentIndex];
+                  numero: _numero, pdfURL: snapshot.data, vehicule: _vehicule)[_currentIndex];
             }
             return CircularProgressIndicator();
           },

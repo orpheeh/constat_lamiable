@@ -72,18 +72,33 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
           if (state is Constat2InitialState) {
             blocContext = context;
             return Scaffold(
+              appBar: AppBar(title: Text("Constat amiable")),
               body: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    RaisedButton(
-                      onPressed: () {
-                        BlocProvider.of<Constat2Bloc>(context)
-                            .dispatch(Constat2GenQRCodeButtonPressed());
-                      },
-                      child: Text("Générer un QR code"),
+                    Center(
+                      child: Icon(Icons.info, size: 30.0, color: Colors.blue[100],),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0, top: 16.0),
+                      child: Text(
+                          "Pour remplir le constat sur deux smartphones il faut que une personne génère un code QR que l'autre doit scanner pour être synchroniser sur le même formulaire.",
+                          textAlign: TextAlign.left,),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          BlocProvider.of<Constat2Bloc>(context)
+                              .dispatch(Constat2GenQRCodeButtonPressed());
+                        },
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("Générer un QR code"),
+                      ),
                     ),
                     RaisedButton(
                       onPressed: () {
@@ -91,6 +106,8 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
                             Constat2ScanQRCodeButtonPressed(
                                 formRepository: widget.formRepository));
                       },
+                      color: Colors.blue,
+                      textColor: Colors.white,
                       child: Text("Scanner un QR code"),
                     ),
                   ],
@@ -101,14 +118,47 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
 
           if (state is Constat2Failure) {
             return Scaffold(
-              body: Center(
-                child: Text("${state.error}"),
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Icon(Icons.error, color: Colors.grey, size: 32.0,),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Une erreur c'est produite soit parce que vous n'êtes pas connecté au réseaux soit parce que vous n'avez pas remplis tous les champs",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12.0),),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Dans tous les cas, nous vous conseillons de vérifier votre connexion et recommencer, merci.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12.0),),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: RaisedButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Retour à l'accueil"),
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           }
 
           if (state is Constat2Finish) {
             FormRepository.persistNumeroConstat(state.numero);
+            FormRepository.persistVehiculeConstat(state.vehicule);
 
             return Scaffold(
                 body: Padding(
@@ -132,7 +182,8 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
                                     "Votre constat à l'amiable à bien été enregistré."),
                             TextSpan(
                                 text:
-                                    "Vous pouvez en télécharger une copie en vous rendant sur le site de constat à l'amiable")
+                                    "Vous pouvez en télécharger une copie en vous rendant sur le site de constat à l'amiable"),
+                            TextSpan(text:"Ou en vous rendant dans votre profile, menu dernier constat")
                           ]),
                     ),
                   ),
@@ -168,6 +219,9 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
 
           if (state is Constat2QRCodeState) {
             return Scaffold(
+              appBar: AppBar(
+                title: Text("Constat amiable"),
+              ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -175,26 +229,33 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Text(
-                          "Attendez que l'autre scan le QRCode avant de remplir le formulaire"),
+                        "Attendez que l'autre scan le Code ci-dessous avant de remplir le formulaire",
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     Center(
                       child: QrImage(
-                        data: state.numero,
+                        data: "${state.numero}:A",
                         version: QrVersions.auto,
                         size: 200.0,
                       ),
                     ),
-                    RaisedButton(
-                      onPressed: () {
-                        BlocProvider.of<Constat2Bloc>(context).dispatch(
-                            Constat2WriteFormButtonPressed(
-                                formRepository: widget.formRepository,
-                                vehicule: "A",
-                                numero: state.numero));
-                      },
-                      child: Text("Remplir le formulaire"),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          BlocProvider.of<Constat2Bloc>(context).dispatch(
+                              Constat2WriteFormButtonPressed(
+                                  formRepository: widget.formRepository,
+                                  vehicule: "A",
+                                  numero: state.numero));
+                        },
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("Remplir le formulaire"),
+                      ),
                     )
                   ],
                 ),
@@ -249,7 +310,6 @@ class _Constat2PhonePageState extends State<Constat2PhonePage> {
                             file: File(path)));
                   } catch (e) {
                     // If an error occurs, log the error to the console.
-                    print(e);
                   }
                 },
               ),

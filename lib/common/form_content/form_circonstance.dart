@@ -2,10 +2,10 @@ import 'package:constat_lamiable/common/form_repository.dart';
 import 'package:flutter/material.dart';
 
 class FormCirconstance extends StatefulWidget {
-
   final FormRepository formRepository;
 
-  const FormCirconstance({Key key, @required this.formRepository}) : super(key: key);
+  const FormCirconstance({Key key, @required this.formRepository})
+      : super(key: key);
 
   @override
   _FormCirconstanceState createState() => _FormCirconstanceState();
@@ -21,33 +21,36 @@ class _FormCirconstanceState extends State<FormCirconstance> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-                "Cochez toute les cases qui correspondent à la situation dans laquelle l'accident a eu lieu",
-                style: TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold
-                ),),
+              "Cochez toute les cases qui correspondent à la situation dans laquelle l'accident a eu lieu",
+              style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+            ),
           ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView(
-                children: List.generate(widget.formRepository.circonstances.length+1, (index){
-                  if(index == widget.formRepository.circonstances.length){
-                    return RaisedButton(
-                      onPressed: (){},
-                      child: Text("J'ai fini"),
-                    );
-                  }
-                  return ListTile(title: Text(widget.formRepository.circonstances[index].description),
-                  leading: Checkbox( 
-                    value: widget.formRepository.circonstances[index].isSelected,
-                    onChanged: (value){
-                    setState(() {
-                     widget.formRepository.circonstances[index].isSelected = value; 
-                    });
-                  },),);
-                })
-              ),
+                  children: List.generate(
+                      widget.formRepository.circonstances.length + 1, (index) {
+                if (index == widget.formRepository.circonstances.length) {
+                  return Container();
+                }
+                return ListTile(
+                  title: Text(
+                    widget.formRepository.circonstances[index].description,
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  leading: Checkbox(
+                    value:
+                        widget.formRepository.circonstances[index].isSelected,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.formRepository.circonstances[index].isSelected =
+                            value;
+                      });
+                    },
+                  ),
+                );
+              })),
             ),
           )
         ],

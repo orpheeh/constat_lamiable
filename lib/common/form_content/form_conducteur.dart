@@ -11,7 +11,10 @@ class FormConducteur extends StatefulWidget {
   final StreamSink flowSink;
 
   const FormConducteur(
-      {Key key, @required this.formRepository, @required this.flowSink, this.paddingBottom = 64.0})
+      {Key key,
+      @required this.formRepository,
+      @required this.flowSink,
+      this.paddingBottom = 64.0})
       : super(key: key);
 
   @override
@@ -85,7 +88,8 @@ class _FormConducteurState extends State<FormConducteur> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Colors.transparent),
-      margin: EdgeInsets.only(left: 16.0, right: 16.0, bottom: widget.paddingBottom),
+      margin: EdgeInsets.only(
+          left: 16.0, right: 16.0, bottom: widget.paddingBottom),
       child: ListView(
         children: <Widget>[
           Padding(
@@ -204,7 +208,7 @@ class _FormConducteurState extends State<FormConducteur> {
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: Colors.deepPurpleAccent,
+                color: Colors.blue,
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -212,13 +216,19 @@ class _FormConducteurState extends State<FormConducteur> {
                   widget.flowSink.add(canNext());
                 });
               },
-              items: <String>["Catégorie", 'A1', 'A' 'B', 'C', 'D', 'E', 'F']
+              items: <String>["Catégorie", 'A1', 'A', 'B', 'C', 'D', 'E', 'F']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                     value: value,
                     child: Row(
                       children: <Widget>[
-                        Icon(Icons.perm_identity),
+                        Icon(value == 'A1' || value == 'A'
+                            ? Icons.directions_bike
+                            : value == 'B' || value == 'E'
+                                ? Icons.directions_car
+                                : value == 'D' || value == 'F'
+                                    ? Icons.local_shipping
+                                    : Icons.directions_bus),
                         Text(value)
                       ],
                     ));

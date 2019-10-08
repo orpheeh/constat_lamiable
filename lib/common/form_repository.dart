@@ -4,20 +4,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'form_content/drawing_table.dart';
 
 class FormRepository {
-
   static const String KEY_NUM_CONSTAT = "numero_constat";
+  static const String KEY_V_CONSTAT = "vehicule_constat";
 
   static Future<void> persistNumeroConstat(String numero) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString(KEY_NUM_CONSTAT, numero);
   }
 
+  static Future<void> persistVehiculeConstat(String v) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(KEY_V_CONSTAT, v);
+  }
+
   static Future<String> getNumeroConstat() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences.containsKey(KEY_NUM_CONSTAT)){
+    if (sharedPreferences.containsKey(KEY_NUM_CONSTAT)) {
       return sharedPreferences.getString(KEY_NUM_CONSTAT);
     } else {
+      return "";
+    }
+  }
 
+  static Future<String> getVehiculeConstat() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.containsKey(KEY_V_CONSTAT)) {
+      return sharedPreferences.getString(KEY_V_CONSTAT);
+    } else {
       return "";
     }
   }
@@ -110,6 +123,7 @@ class FormRepository {
   }
 
   Map<String, dynamic> getRecap() => {
+        "v_type": currentCarIndex,
         "date": context.date.toIso8601String().split('T')[0],
         "heure": "${context.time.hour}:${context.time.minute}",
         "lieu":
@@ -258,27 +272,54 @@ class Assurance {
     sharedPreferences.setString(KEY_NUM_POLICE, numeroPolice);
     sharedPreferences.setString(KEY_NUM_CR, numeroCarteRose);
     sharedPreferences.setString(KEY_AG, agenceCourtier);
-    sharedPreferences.setInt(KEY_VAL_DU, valableDu.millisecondsSinceEpoch);
-    sharedPreferences.setInt(KEY_VAL_AU, valableAu.millisecondsSinceEpoch);
+    sharedPreferences.setInt(KEY_VAL_DU, valableDu?.millisecondsSinceEpoch);
+    sharedPreferences.setInt(KEY_VAL_AU, valableAu?.millisecondsSinceEpoch);
   }
 
   Future<void> load() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if (!sharedPreferences.containsKey(KEY_NAME)) {
-      return;
+
+    if (sharedPreferences.containsKey(KEY_NAME)) {
+      this.nom = sharedPreferences.getString(KEY_NAME);
     }
-    this.nom = sharedPreferences.getString(KEY_NAME);
-    this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
-    this.adresse = sharedPreferences.getString(KEY_ADRESSE);
-    this.bp = sharedPreferences.getString(KEY_BP);
-    this.tel = sharedPreferences.getString(KEY_TEL);
-    this.numeroPolice = sharedPreferences.getString(KEY_NUM_POLICE);
-    this.numeroCarteRose = sharedPreferences.getString(KEY_NUM_CR);
-    this.agenceCourtier = sharedPreferences.getString(KEY_AG);
-    this.valableDu = DateTime.fromMicrosecondsSinceEpoch(
-        sharedPreferences.getInt(KEY_VAL_DU));
-    this.valableAu = DateTime.fromMicrosecondsSinceEpoch(
-        sharedPreferences.getInt(KEY_VAL_AU));
+
+    if (sharedPreferences.containsKey(KEY_FIRST_NAME)) {
+      this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
+    }
+
+    if (sharedPreferences.containsKey(KEY_ADRESSE)) {
+      this.adresse = sharedPreferences.getString(KEY_ADRESSE);
+    }
+
+    if (sharedPreferences.containsKey(KEY_BP)) {
+      this.bp = sharedPreferences.getString(KEY_BP);
+    }
+
+    if (sharedPreferences.containsKey(KEY_TEL)) {
+      this.tel = sharedPreferences.getString(KEY_TEL);
+    }
+
+    if (sharedPreferences.containsKey(KEY_NUM_POLICE)) {
+      this.numeroPolice = sharedPreferences.getString(KEY_NUM_POLICE);
+    }
+
+    if (sharedPreferences.containsKey(KEY_NUM_CR)) {
+      this.numeroCarteRose = sharedPreferences.getString(KEY_NUM_CR);
+    }
+
+    if (sharedPreferences.containsKey(KEY_AG)) {
+      this.agenceCourtier = sharedPreferences.getString(KEY_AG);
+    }
+
+    if (sharedPreferences.containsKey(KEY_VAL_DU)) {
+      this.valableDu = DateTime.fromMicrosecondsSinceEpoch(
+          sharedPreferences.getInt(KEY_VAL_DU));
+    }
+
+    if (sharedPreferences.containsKey(KEY_VAL_AU)) {
+      this.valableAu = DateTime.fromMicrosecondsSinceEpoch(
+          sharedPreferences.getInt(KEY_VAL_AU));
+    }
   }
 }
 
@@ -328,28 +369,47 @@ class Conducteur {
     sharedPreferences.setString(KEY_TEL, telephone);
     sharedPreferences.setString(KEY_NUM, numeroPermisConduire);
     sharedPreferences.setString(KEY_CAT, category);
-    sharedPreferences.setInt(KEY_DEL, delivrer.millisecondsSinceEpoch);
+    sharedPreferences.setInt(KEY_DEL, delivrer?.millisecondsSinceEpoch);
     sharedPreferences.setString(KEY_DEL_PAR, delivrerPar);
-    sharedPreferences.setInt(KEY_DATE_VAL, dateValidite.millisecondsSinceEpoch);
+    sharedPreferences.setInt(
+        KEY_DATE_VAL, dateValidite?.millisecondsSinceEpoch);
   }
 
   Future<void> load() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if (!sharedPreferences.containsKey(KEY_NAME)) {
-      return;
+    if (sharedPreferences.containsKey(KEY_NAME)) {
+      this.nom = sharedPreferences.getString(KEY_NAME);
     }
-    this.nom = sharedPreferences.getString(KEY_NAME);
-    this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
-    this.adresse = sharedPreferences.getString(KEY_ADRESSE);
-    this.licenceCyclomoteur = sharedPreferences.getString(KEY_CYCLO);
-    this.telephone = sharedPreferences.getString(KEY_TEL);
-    this.numeroPermisConduire = sharedPreferences.getString(KEY_NUM);
-    this.category = sharedPreferences.getString(KEY_CAT);
-    this.delivrer =
-        DateTime.fromMillisecondsSinceEpoch(sharedPreferences.getInt(KEY_DEL));
-    this.delivrerPar = sharedPreferences.getString(KEY_DEL_PAR);
-    this.dateValidite = DateTime.fromMillisecondsSinceEpoch(
-        sharedPreferences.getInt(KEY_DATE_VAL));
+
+    if (sharedPreferences.containsKey(KEY_FIRST_NAME)) {
+      this.prenom = sharedPreferences.getString(KEY_FIRST_NAME);
+    }
+    if (sharedPreferences.containsKey(KEY_ADRESSE)) {
+      this.adresse = sharedPreferences.getString(KEY_ADRESSE);
+    }
+    if (sharedPreferences.containsKey(KEY_CYCLO)) {
+      this.licenceCyclomoteur = sharedPreferences.getString(KEY_CYCLO);
+    }
+    if (sharedPreferences.containsKey(KEY_NUM)) {
+      this.numeroPermisConduire = sharedPreferences.getString(KEY_NUM);
+    }
+    if (sharedPreferences.containsKey(KEY_CAT)) {
+      this.category = sharedPreferences.getString(KEY_CAT);
+    }
+    if (sharedPreferences.containsKey(KEY_DEL)) {
+      this.delivrer = DateTime.fromMillisecondsSinceEpoch(
+          sharedPreferences.getInt(KEY_DEL));
+    }
+    if (sharedPreferences.containsKey(KEY_DEL_PAR)) {
+      this.delivrerPar = sharedPreferences.getString(KEY_DEL_PAR);
+    }
+    if (sharedPreferences.containsKey(KEY_DATE_VAL)) {
+      this.dateValidite = DateTime.fromMillisecondsSinceEpoch(
+          sharedPreferences.getInt(KEY_DATE_VAL));
+    }
+    if (sharedPreferences.containsKey(KEY_TEL)) {
+      this.telephone = sharedPreferences.getString(KEY_TEL);
+    }
   }
 }
 

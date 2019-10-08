@@ -85,7 +85,7 @@ class _FormVehiculeState extends State<FormVehicule> {
                           .carTypes[widget.formRepository.currentCarIndex]
                           .useRemorque,
                     ),
-                    title: Text("J'utilise une remorque ou une semi remorque"))
+                    title: Text("Cochez cette case si vous utilisez une remorque ou une semi remorque", style: TextStyle(fontSize: 12.0),))
                 : Container(),
             Padding(
               padding: const EdgeInsets.all(8.0),

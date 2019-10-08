@@ -46,7 +46,6 @@ class Repository {
       headers: {"content-type": "application/json"},
     );
     if (response.statusCode == 200) {
-      print(response.body);
       final Map<String, dynamic> map = jsonDecode(response.body)["constat"];
       return map["vehiculeA"]["finish"] && map["vehiculeB"]["finish"]
           ? map["final"]
@@ -57,9 +56,7 @@ class Repository {
   }
 
   Future<void> uploadPicture({File file, String numero}) async {
-    print("prepare send image");
     if (file == null) return;
-    print("send image");
     String base64Image = base64Encode(file.readAsBytesSync());
     String fileName = file.path.split("/").last;
 

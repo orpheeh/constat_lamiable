@@ -20,12 +20,10 @@ class _FormRecapState extends State<FormRecap> {
           padding: const EdgeInsets.all(8.0),
           child: !_showRecap
               ? RaisedButton(
-                  child: ListTile(
-                    leading: Icon(Icons.search),
-                    title: Text("Voir le récapitule"),
-                  ),
+                  child: Text("Voir le récapitulatif"),
                   onPressed: () {
                     setState(() {
+                      
                       _showRecap = true;
                     });
                   },
