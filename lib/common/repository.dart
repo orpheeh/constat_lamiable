@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'form_repository.dart';
 
 class Repository {
-  static const IP = "http://192.168.100.216:3000";
+  static String IP = "http://192.168.100.226:3000";
 
   Future<String> createConstat() async {
     final response = await http.post(IP + "/constat/create", body: {});

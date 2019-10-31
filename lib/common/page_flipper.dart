@@ -59,7 +59,11 @@ class _PageFlipperState extends State<PageFlipper>
   @override
   void initState() {
     super.initState();
-    widget.animationController = new AnimationController(
+    init();
+  }
+
+  void init(){
+        widget.animationController = new AnimationController(
         duration: Duration(milliseconds: 500), vsync: this)
       ..addListener(() {
         setState(() {
@@ -76,9 +80,14 @@ class _PageFlipperState extends State<PageFlipper>
   }
 
   @override
+  void didUpdateWidget(Widget oldWidget){
+    super.didUpdateWidget(oldWidget);
+    init();
+  }
+
+  @override
   void dispose() {
     super.dispose();
-
     widget.animationController.dispose();
   }
 

@@ -40,6 +40,9 @@ class FormRepository {
     conducteur.load();
   }
 
+  bool isOffline = false;
+  String name = "A";
+
   //Vehicule
   final List<CarType> carTypes = [
     CarType(name: "car", asset: "assets/images/car.png"),

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:constat_lamiable/common/form.dart';
 import 'package:constat_lamiable/common/form_repository.dart';
+import 'package:constat_lamiable/common/offline/local_constat_storage.dart';
 import 'package:constat_lamiable/common/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,9 +16,13 @@ import 'constat_1_smartphone_bloc.dart';
 class Constat1PhonePage extends StatefulWidget {
   final Map<String, FormRepository> formRepository;
   final Repository repository;
+  final LocalConstatStorage localConstatStorage;
 
   const Constat1PhonePage(
-      {Key key, this.formRepository, @required this.repository})
+      {Key key,
+      this.formRepository,
+      @required this.repository,
+      @required this.localConstatStorage})
       : super(key: key);
   @override
   _Constat1PhonePageState createState() => _Constat1PhonePageState();
@@ -43,6 +48,8 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
         BlocProvider.of<Constat1Bloc>(blocContext).dispatch(Constat1SendForm(
             numero: data["numero"],
             vehicule: data["vehicule"],
+            formRepository2:
+                data["vehicule"] == "B" ? widget.formRepository["A"] : null,
             formRepository: widget.formRepository[data["vehicule"]]));
       }
     });
@@ -57,8 +64,12 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
   @override
   Widget build(BuildContext ctx) {
     return BlocProvider<Constat1Bloc>(
-      builder: (context) => Constat1Bloc(repository: widget.repository)
-        ..dispatch(Constat1Started()),
+      builder: (context) => Constat1Bloc(
+          repository: widget.repository,
+          localConstatStorage: widget.localConstatStorage)
+        ..dispatch(Constat1Started(
+            formRepository1: widget.formRepository["A"],
+            formRepository2: widget.formRepository["B"])),
       child: BlocBuilder<Constat1Bloc, Constat1State>(
         builder: (BuildContext context, Constat1State state) {
           if (state is Constat1Loading) {
@@ -71,18 +82,26 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
 
           if (state is Constat1Initial) {
             blocContext = context;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text("Vehicule ${state.vehicule}"),
-              ),
-              body: ConstatForm(
-                formRepository: widget.formRepository[state.vehicule],
-                sink: streamController.sink,
-                numero: state.numero,
-                vehicule: state.vehicule,
-                scrollPercentInitial: state.scrollPercentInital,
-              ),
-            );
+            return new Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    "Vehicule ${state.vehicule}",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  leading: Icon(
+                    widget.formRepository[state.vehicule].isOffline
+                        ? Icons.network_locked
+                        : Icons.network_wifi,
+                    color: Colors.blue[100],
+                  ),
+                ),
+                body: ConstatForm(
+                  formRepository: widget.formRepository[state.vehicule],
+                  sink: streamController.sink,
+                  numero: state.numero,
+                  vehicule: state.vehicule,
+                  scrollPercentInitial: state.scrollPercentInital,
+                ));
           }
 
           if (state is Constat1CameraPreview) {
@@ -121,7 +140,6 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
                       '${DateTime.now().millisecondsSinceEpoch}.png',
                     );
 
-
                     // Attempt to take a picture and log where it's been saved.
                     await state.controller.takePicture(path);
 
@@ -140,7 +158,9 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
           }
 
           if (state is Constat1Finish) {
-            FormRepository.persistNumeroConstat(state.numero);
+            if (widget.formRepository["A"].isOffline == false) {
+              FormRepository.persistNumeroConstat(state.numero);
+            }
 
             return Scaffold(
                 body: Padding(
@@ -164,9 +184,15 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
                                     "Votre constat à l'amiable à bien été enregistré."),
                             TextSpan(
                                 text:
-                                    "Vous pouvez en télécharger une copie en vous rendant sur le site de constat à l'amiable")
+                                    "Vous pouvez en télécharger une copie en vous rendant sur le site de constat à l'amiable ou en allant dans votre profil / Dernier constat")
                           ]),
                     ),
+                  ),
+                  Text(
+                      "Pour vous rendre dans votre profil il vous suffit d'allez à l'accueil puis appuyer sur l'icone: "),
+                  Icon(
+                    Icons.person,
+                    color: Colors.blue,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
@@ -208,25 +234,33 @@ class _Constat1PhonePageState extends State<Constat1PhonePage> {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Center(
-                        child: Icon(Icons.error, color: Colors.grey, size: 32.0,),
+                        child: Icon(
+                          Icons.error,
+                          color: Colors.grey,
+                          size: 32.0,
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text("Une erreur c'est produite soit parce que vous n'êtes pas connecté au réseaux soit parce que vous n'avez pas remplis tous les champs",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12.0),),
+                      child: Text(
+                        "Une erreur c'est produite soit parce que vous n'êtes pas connecté au réseaux soit parce que vous n'avez pas remplis tous les champs",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12.0),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text("Dans tous les cas, nous vous conseillons de vérifier votre connexion et recommencer, merci.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12.0),),
+                      child: Text(
+                        "Dans tous les cas, nous vous conseillons de vérifier votre connexion et recommencer, merci.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12.0),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: RaisedButton(
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.of(context).pop();
                         },
                         child: Text("Retour à l'accueil"),

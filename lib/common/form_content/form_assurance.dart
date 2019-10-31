@@ -9,7 +9,10 @@ class FormAssurance extends StatefulWidget {
   final StreamSink flowSink;
 
   const FormAssurance(
-      {Key key, @required this.flowSink, @required this.formRepository, this.paddingBottom = 64.0})
+      {Key key,
+      @required this.flowSink,
+      @required this.formRepository,
+      this.paddingBottom = 64.0})
       : super(key: key);
 
   @override
@@ -62,6 +65,16 @@ class _FormAssuranceState extends State<FormAssurance> {
   @override
   void initState() {
     super.initState();
+    init();
+  }
+
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    init();
+  }
+
+  void init() {
     _nomController.text = widget.formRepository.assurance.nom;
     _prenomController.text = widget.formRepository.assurance.prenom;
     _adresseController.text = widget.formRepository.assurance.adresse;
@@ -75,7 +88,8 @@ class _FormAssuranceState extends State<FormAssurance> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: widget.paddingBottom),
+      padding: EdgeInsets.only(
+          left: 16.0, right: 16.0, bottom: widget.paddingBottom),
       child: ListView(
         children: <Widget>[
           Padding(

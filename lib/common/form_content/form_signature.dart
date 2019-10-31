@@ -50,11 +50,9 @@ class _FormSignatureState extends State<FormSignature> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin:
-          EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 64.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+      margin: EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 64.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <
+          Widget>[
         Row(
           children: <Widget>[
             IconButton(
@@ -80,19 +78,21 @@ class _FormSignatureState extends State<FormSignature> {
             Expanded(
               child: Container(),
             ),
-            IconButton(
-              onPressed: () {
-                widget.sink.add({
-                  "type": 0,
-                  "numero": widget.numero,
-                  "vehicule": widget.vehicule
-                });
-              },
-              icon: Icon(
-                Icons.add_a_photo,
-                color: Colors.blue,
-              ),
-            )
+            widget.formRepository.isOffline
+                ? Container()
+                : IconButton(
+                    onPressed: () {
+                      widget.sink.add({
+                        "type": 0,
+                        "numero": widget.numero,
+                        "vehicule": widget.vehicule
+                      });
+                    },
+                    icon: Icon(
+                      Icons.add_a_photo,
+                      color: Colors.blue,
+                    ),
+                  )
           ],
         ),
         Expanded(

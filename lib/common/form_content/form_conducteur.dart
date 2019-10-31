@@ -70,7 +70,16 @@ class _FormConducteurState extends State<FormConducteur> {
   @override
   void initState() {
     super.initState();
+    init();
+  }
 
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    init();
+  }
+
+  void init() {
     delIsSelected = widget.formRepository.conducteur.delivrer != null;
     valIsSelected = widget.formRepository.conducteur.dateValidite != null;
 

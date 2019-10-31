@@ -1,15 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:constat_lamiable/common/form_repository.dart';
+import 'package:constat_lamiable/common/offline/local_constat_storage.dart';
 import 'package:constat_lamiable/common/repository.dart';
 import 'package:flutter/material.dart';
 
 class Constat1Bloc extends Bloc<Constat1Event, Constat1State> {
   final Repository repository;
+  final LocalConstatStorage localConstatStorage;
 
-  Constat1Bloc({@required this.repository});
+  Constat1Bloc({@required this.repository, @required this.localConstatStorage});
   @override
   Constat1State get initialState => Constat1Loading();
 
@@ -20,9 +23,21 @@ class Constat1Bloc extends Bloc<Constat1Event, Constat1State> {
       try {
         //Create constat
         final String numero = await repository.createConstat();
+        print("Dispatch one");
         dispatch(Constat1StartForm(numero: numero, vehicule: "A"));
       } catch (error) {
-        yield Constat1Failure(error: error.toString());
+        print(error);
+        if (error is SocketException) {
+          //Config for local storage
+          event.formRepository1.isOffline = true;
+          event.formRepository2.isOffline = true;
+          event.formRepository2.name = "B";
+          final String numero =
+              DateTime.now().millisecondsSinceEpoch.toString();
+          dispatch(Constat1StartForm(numero: numero, vehicule: "A"));
+        } else {
+          yield Constat1Failure(error: error.toString());
+        }
       }
     }
 
@@ -90,20 +105,35 @@ class Constat1Bloc extends Bloc<Constat1Event, Constat1State> {
       yield Constat1Loading();
 
       try {
-        //Send form to server
-        Map<String, bool> result = await repository.sendForm(
-            numero: event.numero,
-            vehicule: event.vehicule,
-            recap: event.formRepository.getRecap());
-        //verify result
-        if (result["A"] && result["B"]) {
-          //  Show constat1Finish
-          yield Constat1Finish(numero: event.numero);
+        if (event.formRepository.isOffline) {
+          print("Save locally please tank you !");
+          print(event.numero);
+          print(event.vehicule);
+          //Save locally
+          if (event.vehicule == "B") {
+            print("Finish");
+            String a = jsonEncode(event.formRepository.getRecap());
+            String b = jsonEncode(event.formRepository2.getRecap());
+            await localConstatStorage.insertConstat(LocalConstat(a: a, b: b));
+            yield Constat1Finish(numero: event.numero);
+          } else {
+            print("start form for second");
+            event.formRepository.getRecap();
+            yield Constat1Initial(numero: event.numero, vehicule: "B");
+          }
         } else {
-          yield Constat1Initial(numero: event.numero, vehicule: "B");
+          //Send form to server
+          Map<String, bool> result = await repository.sendForm(
+              numero: event.numero,
+              vehicule: event.vehicule,
+              recap: event.formRepository.getRecap());
+          //verify result
+          if (result["A"] && result["B"]) {
+            yield Constat1Finish(numero: event.numero);
+          } else {
+            yield Constat1Initial(numero: event.numero, vehicule: "B");
+          }
         }
-        //If on result, vehiculeA.finish == true and vehiculeB.finish == true
-        //Else start new form
       } catch (error) {
         yield Constat1Failure(error: error.toString());
       }
@@ -166,7 +196,13 @@ class Constat1Finish extends Constat1State {
 
 class Constat1Event {}
 
-class Constat1Started extends Constat1Event {}
+class Constat1Started extends Constat1Event {
+  final FormRepository formRepository1;
+  final FormRepository formRepository2;
+
+  Constat1Started(
+      {@required this.formRepository1, @required this.formRepository2});
+}
 
 class Constat1StartForm extends Constat1Event {
   final String vehicule;
@@ -179,9 +215,11 @@ class Constat1SendForm extends Constat1Event {
   final String numero;
   final String vehicule;
   final FormRepository formRepository;
+  final FormRepository formRepository2;
 
   Constat1SendForm(
       {@required this.formRepository,
+      this.formRepository2,
       @required this.numero,
       @required this.vehicule});
 }

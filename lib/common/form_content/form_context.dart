@@ -84,6 +84,12 @@ class _FormContexteState extends State<FormContexte> {
   @override
   void initState() {
     super.initState();
+    init();
+  }
+
+  void init() {
+    _showCart = !widget.formRepository.isOffline;
+
     _isSelectedDate = widget.formRepository.context.date != null;
     _isSelectedTime = widget.formRepository.context.time != null;
 
@@ -91,6 +97,12 @@ class _FormContexteState extends State<FormContexte> {
     _villeController.text = widget.formRepository.context.ville;
     _venantController.text = widget.formRepository.context.venantDe;
     _allantController.text = widget.formRepository.context.allantVers;
+  }
+
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    init();
   }
 
   @override
@@ -350,82 +362,91 @@ class _FormContexteState extends State<FormContexte> {
               )
             ],
           ),
-          !_showCart ? Container() : Card(
-            elevation: 8.0,
-            color: Colors.pink[100],
-            margin: EdgeInsets.all(16.0),
-            child: Column(children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  "Indiquez l'endroit ou l'accident a eu lieu sur la carte",
-                  style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              Container(
-                height: 250,
-                margin: EdgeInsets.all(16.0),
-                child: new FlutterMap(
-                  options: new MapOptions(
-                      center: widget.formRepository.context.location["lat"] <=
-                              0.0
-                          ? LatLng(0.4115524, 9.294541)
-                          : LatLng(
-                              widget.formRepository.context.location["lat"],
-                              widget.formRepository.context.location["lng"]),
-                      zoom: 12.0,
-                      onTap: (location) {
-                        setState(() {
-                          widget.formRepository.context.location["lat"] =
-                              location.latitude;
-                          widget.formRepository.context.location["lng"] =
-                              location.longitude;
-                          isClicked = true;
-                        });
-                      }),
-                  layers: [
-                    TileLayerOptions(
-                        urlTemplate:
-                            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                        subdomains: ['a', 'b', 'c']),
-                    new MarkerLayerOptions(
-                      markers: isClicked
-                          ? [
-                              new Marker(
-                                width: 80.0,
-                                height: 80.0,
-                                point: new LatLng(
-                                    widget
-                                        .formRepository.context.location["lat"],
-                                    widget.formRepository.context
-                                        .location["lng"]),
-                                builder: (ctx) => GestureDetector(
-                                  child: new Container(
-                                    child: Icon(
-                                      Icons.edit_location,
-                                      size: 40.0,
-                                      color: Colors.deepPurple,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ]
-                          : [],
+          !_showCart
+              ? Container()
+              : Card(
+                  elevation: 8.0,
+                  color: Colors.pink[100],
+                  margin: EdgeInsets.all(16.0),
+                  child: Column(children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        "Indiquez l'endroit ou l'accident a eu lieu sur la carte",
+                        style: TextStyle(
+                            fontSize: 14.0, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              isClicked ? FlatButton(child: Text("Continuer"),
-              color: Colors.purple,
-              textColor: Colors.white,
-              onPressed: (){
-                setState(() {
-                 _showCart = false; 
-                });
-              },):Container()
-            ]),
-          )
+                    Container(
+                      height: 250,
+                      margin: EdgeInsets.all(16.0),
+                      child: new FlutterMap(
+                        options: new MapOptions(
+                            center:
+                                widget.formRepository.context.location["lat"] <=
+                                        0.0
+                                    ? LatLng(0.4115524, 9.294541)
+                                    : LatLng(
+                                        widget.formRepository.context
+                                            .location["lat"],
+                                        widget.formRepository.context
+                                            .location["lng"]),
+                            zoom: 12.0,
+                            onTap: (location) {
+                              setState(() {
+                                widget.formRepository.context.location["lat"] =
+                                    location.latitude;
+                                widget.formRepository.context.location["lng"] =
+                                    location.longitude;
+                                isClicked = true;
+                              });
+                            }),
+                        layers: [
+                          TileLayerOptions(
+                              urlTemplate:
+                                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                              subdomains: ['a', 'b', 'c']),
+                          new MarkerLayerOptions(
+                            markers: isClicked
+                                ? [
+                                    new Marker(
+                                      width: 80.0,
+                                      height: 80.0,
+                                      point: new LatLng(
+                                          widget.formRepository.context
+                                              .location["lat"],
+                                          widget.formRepository.context
+                                              .location["lng"]),
+                                      builder: (ctx) => GestureDetector(
+                                        child: new Container(
+                                          child: Icon(
+                                            Icons.edit_location,
+                                            size: 40.0,
+                                            color: Colors.deepPurple,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                        ],
+                      ),
+                    ),
+                    isClicked
+                        ? FlatButton(
+                            child: Text("Continuer"),
+                            color: Colors.purple,
+                            textColor: Colors.white,
+                            onPressed: () {
+                              setState(() {
+                                _showCart = false;
+                              });
+                            },
+                          )
+                        : Container()
+                  ]),
+                )
         ],
       ),
     );

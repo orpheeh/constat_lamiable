@@ -20,14 +20,17 @@ class ConstatForm extends StatefulWidget {
   final StreamSink sink;
   final double scrollPercentInitial;
 
-  const ConstatForm(
+  ConstatForm(
       {Key key,
       @required this.formRepository,
       @required this.sink,
       @required this.numero,
       @required this.vehicule,
       this.scrollPercentInitial = 0.0})
-      : super(key: key);
+      : super(key: key) {
+    print("Create ConstatForm Object");
+  }
+
   @override
   _ConstatFormState createState() => _ConstatFormState();
 }
@@ -40,12 +43,12 @@ class _ConstatFormState extends State<ConstatForm> {
   @override
   void initState() {
     super.initState();
+    initForm();
+  }
 
-    flowStreamController.stream.listen((data) {
-      setState(() {
-      });
-    });
-
+  void initForm() {
+    print("Start Constat Form ${widget.vehicule}");
+    print("Form ${widget.vehicule}");
     _pageFlipper = PageFlipper(
       titles: <String>[
         "Contexte",
@@ -94,6 +97,12 @@ class _ConstatFormState extends State<ConstatForm> {
       ],
     );
     _pageFlipper.scrollPercent = widget.scrollPercentInitial;
+  }
+
+  @override
+  void didUpdateWidget(Widget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    initForm();
   }
 
   @override
