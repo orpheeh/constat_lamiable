@@ -80,8 +80,12 @@ class _PageFlipperState extends State<PageFlipper>
   }
 
   @override
-  void didUpdateWidget(Widget oldWidget){
+  void didUpdateWidget(PageFlipper oldWidget){
     super.didUpdateWidget(oldWidget);
+    widget.scrollPercent = oldWidget.scrollPercent;
+    if(widget.scrollPercent >= widget.pages.length-1){
+      widget.scrollPercent = 0;
+    }
     init();
   }
 

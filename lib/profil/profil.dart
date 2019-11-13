@@ -95,33 +95,48 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
         _hasOffline
-            ? ListView(children: [
-                Text("Envoyer le constat que vous aviez remplis hors ligne"),
-                RaisedButton(
-                  onPressed: () async {
-                    if (saveConstat != null) {
-                      final numero = await widget.repository.createConstat();
-                      this._numero = numero;
-                      await widget.repository.sendForm(
-                          vehicule: "A",
-                          numero: numero,
-                          recap: jsonDecode(saveConstat.a));
-                      await widget.repository.sendForm(
-                          vehicule: "B",
-                          numero: numero,
-                          recap: jsonDecode(saveConstat.b));
-                      await widget.localConstatStorage
-                          .deleteConstat(saveConstat.id);
-                      await FormRepository.persistNumeroConstat(numero);
-                      setState(() {
-                        _hasOffline = false;
-                      });
-                      _canUploadPicture = true;
-                    }
-                  },
-                  child: Text("Envoyer"),
-                )
-              ])
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        "Envoyer le constat que vous aviez remplis hors ligne",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: RaisedButton(
+                        onPressed: () async {
+                          if (saveConstat != null) {
+                            final numero =
+                                await widget.repository.createConstat();
+                            this._numero = numero;
+                            await widget.repository.sendForm(
+                                vehicule: "A",
+                                numero: numero,
+                                recap: jsonDecode(saveConstat.a));
+                            await widget.repository.sendForm(
+                                vehicule: "B",
+                                numero: numero,
+                                recap: jsonDecode(saveConstat.b));
+                            await widget.localConstatStorage
+                                .deleteConstat(saveConstat.id);
+                            await FormRepository.persistNumeroConstat(numero);
+                            setState(() {
+                              _hasOffline = false;
+                            });
+                            _canUploadPicture = true;
+                          }
+                        },
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("Envoyer"),
+                      ),
+                    )
+                  ])
             : _canUploadPicture
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +152,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Text("$pictureCount"),
                         ),
                         IconButton(
-                          icon: Icon(Icons.photo, color: Colors.grey,),
+                          icon: Icon(
+                            Icons.attach_file,
+                            color: Colors.grey,
+                          ),
                           onPressed: () {
                             takePicture(numero: _numero);
                           },

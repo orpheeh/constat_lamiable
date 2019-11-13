@@ -102,6 +102,7 @@ class _FormContexteState extends State<FormContexte> {
   @override
   void didUpdateWidget(Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _showCart = false;
     init();
   }
 
